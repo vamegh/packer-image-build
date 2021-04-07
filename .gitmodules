@@ -1,0 +1,3 @@
+[submodule "packer-image-build/ansible/roles/users_and_groups"]
+	path = packer-image-build/ansible/roles/users_and_groups
+	url = https://github.com/sansible/users_and_groups

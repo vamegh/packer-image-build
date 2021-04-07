@@ -1,0 +1,46 @@
+---
+
+# 5.1 Cron
+
+- name: Set cron tab permissions
+  file:
+    path: "{{ item }}"
+    state: file
+    owner: root
+    group: root
+    mode: 0600
+  with_items:
+    - '/etc/crontab'
+
+- name: Set cron tab permissions
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0700
+  with_items:
+    - '/etc/cron.hourly'
+    - '/etc/cron.daily'
+    - '/etc/cron.weekly'
+    - '/etc/cron.monthly'
+    - '/etc/cron.d'
+
+- name: Setup cron authorization file
+  copy:
+    src: "{{ item }}"
+    dest: "/etc/{{ item }}"
+    owner: root
+    group: root
+    mode: 0600
+  with_items:
+    - 'cron.allow'
+    - 'at.allow'
+
+- name: Setup cron authorization file
+  file:
+    path: "/etc/{{ item }}"
+    state: absent
+  with_items:
+    - 'cron.deny'
+    - 'at.deny'

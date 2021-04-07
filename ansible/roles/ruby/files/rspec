@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+require 'rubygems'
+
+# Prepares the $LOAD_PATH by adding to it lib directories of the gem and
+# its dependencies:
+gem 'rspec-core'
+
+# Loads the original executable
+load Gem.bin_path('rspec-core', 'rspec')

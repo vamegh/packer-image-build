@@ -1,0 +1,17 @@
+**/.terraform/*
+
+# .tfstate files
+*.tfstate
+*.tfstate.*
+
+# .tfvars files
+*.tfvars
+
+# swap file (for vim)
+*.swap
+
+# intellij
+.idea/*
+
+# python
+__pycache__/*

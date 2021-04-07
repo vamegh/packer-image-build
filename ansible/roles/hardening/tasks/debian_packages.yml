@@ -1,0 +1,38 @@
+---
+
+#
+# Uninstall unwanted packages
+#
+- name: Debian - -
+  apt: name={{ item }} state=absent update-cache=yes purge=yes
+  with_items:
+    - apache2
+    - bind9
+    - cups
+    - exim
+    - nis
+    - rpcbind
+    - rsync
+    - samba
+    - slapd
+    - snmpd
+    - squid
+    - vsftpd
+    - xinetd
+
+#
+# Add required non-standard packages
+# Add EN-GB language pack.
+#
+- name: Debian - Install Auditd, NTP and libpam-pwquality
+  apt: name={{ item }} state=latest update-cache=yes
+  with_items:
+     - ntp
+     - auditd
+     - libpam-pwquality
+     - language-pack-en
+     - unzip
+
+- name: Debian - Install Postfix
+  apt: name=postfix state=latest update-cache=yes
+  notify: restart postfix

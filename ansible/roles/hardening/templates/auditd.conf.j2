@@ -1,0 +1,12 @@
+log_format = RAW
+log_group = root
+flush = incremental
+freq = 75
+num_logs = 10
+name_format = hostname
+
+max_log_file = 50
+max_log_file_action = rotate
+space_left = 500
+space_left_action = syslog
+disk_full_action = syslog

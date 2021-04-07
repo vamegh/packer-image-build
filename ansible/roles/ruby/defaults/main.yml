@@ -1,0 +1,4 @@
+ruby_install_gems:
+  - bundler
+ruby_main_version: 2.5
+ruby_minor_version: 2.5.1

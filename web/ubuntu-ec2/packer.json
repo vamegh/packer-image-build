@@ -1,0 +1,82 @@
+{
+  "builders": [
+    {
+      "type": "amazon-ebs",
+      "region": "{{user `region`}}",
+      "source_ami_filter": {
+        "filters": {
+          "tag:ami_role": "{{user `base_ami_role`}}",
+          "tag:release_status": "{{user `base_release_status`}}"
+        },
+        "owners": [
+          "{{user `ami_owner`}}"
+        ],
+        "most_recent": true
+      },
+      "instance_type": "{{user `instance_type`}}",
+      "iam_instance_profile": "{{user `iam_instance_profile`}}",
+      "ssh_username": "{{user `ssh_username`}}",
+      "ssh_pty": true,
+      "ami_name": "{{user `ami_role`}}.v{{user `version`}}-{{ (isotime (user `date_format`)) | clean_ami_name }}",
+      "ami_users": [],
+      "security_group_id": "{{user `packer_security_group_id`}}",
+      "subnet_id": "{{user `packer_subnet_id`}}",
+      "tags": {
+        "ami_role": "{{user `ami_role`}}",
+        "release_status": "{{user `release_status`}}",
+        "builder": "packer {{packer_version}}",
+        "version": "{{user `version`}}",
+        "encrypted": "{{user `encrypted`}}",
+        "build_name": "{{build_name}}",
+        "build_type": "{{build_type}}",
+        "build_SHA": "{{user `git_sha`}}"
+      },
+      "launch_block_device_mappings": [
+        {
+          "device_name": "{{user `root_device_name`}}",
+          "volume_type": "{{user `root_volume_type`}}",
+          "volume_size": "{{user `root_volume_size`}}",
+          "delete_on_termination": true
+        }
+      ],
+      "ami_block_device_mappings": [
+        {
+          "device_name": "{{user `root_device_name`}}",
+          "volume_type": "{{user `root_volume_type`}}",
+          "volume_size": "{{user `root_volume_size`}}",
+          "delete_on_termination": true
+        }
+      ]
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "file",
+      "source": "../../build-tools/scripts",
+      "destination": "/tmp/scripts"
+    },
+    {
+      "type": "file",
+      "source": "../../build-tools",
+      "destination": "/tmp/build-tools"
+    },
+    {
+      "type": "file",
+      "source": "bootstrap-scripts",
+      "destination": "/tmp/bootstrap-scripts"
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "sudo /bin/bash /tmp/scripts/ubuntu/install_aws_tools.sh",
+        "sudo /bin/bash /tmp/bootstrap-scripts/install_web.sh"
+      ]
+    },
+    {
+      "inline": [
+        "echo \"sudo rm -rf /tmp/scripts\""
+      ],
+      "type": "shell"
+    }
+  ]
+}

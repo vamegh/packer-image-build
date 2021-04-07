@@ -1,0 +1,23 @@
+{
+    "version": "1",
+    "release_status": "release",
+    "ami_role": "core-ubuntu-base",
+    "base_ami_name": "ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*",
+    "base_virt_type": "hvm",
+    "base_device_type": "ebs",
+    "base_release_status": "release",
+    "encrypted": "false",
+    "packer_security_group_id": "",
+    "packer_subnet_id": "",
+    "date_format": "2006-01-02",
+    "region": "",
+    "instance_type": "t2.small",
+    "iam_instance_profile": "packer-build",
+    "ssh_username": "ubuntu",
+    "root_device_name": "/dev/sda1",
+    "root_volume_type": "gp2",
+    "root_volume_size": "20",
+    "ansible_files": "/tmp/files",
+    "ami_owner": "099720109477",
+    "packer_vpc_id": ""
+}

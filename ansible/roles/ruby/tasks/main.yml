@@ -1,0 +1,47 @@
+# This is required to run the Ruby script
+- name: Remove system Ruby
+  apt:
+    name: ruby
+    state: absent
+
+# Build tools to compile Ruby
+- name: Install Ruby
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+    state: present
+  with_items:
+    - build-essential
+    - zlib1g-dev
+    - libssl-dev
+    - libreadline-gplv2-dev
+    - libyaml-dev
+    - git-core
+  when:
+    - ansible_distribution == "Ubuntu"
+
+# The following script will be skipped if a Ruby binary is already present
+- name: Copy Ruby install script
+  copy:
+    src: install_ruby.sh
+    dest: /root/install_ruby.sh
+    owner: root
+    group: root
+    mode: 0700
+
+- name: Install Ruby with Bash script
+  command: "/root/install_ruby.sh {{ ruby_main_version }} {{ ruby_minor_version }}"
+
+- name: Install configured gems.
+  gem:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ ruby_install_gems }}"
+
+- name: Create rspec binary
+  copy:
+    src: rspec
+    dest: /usr/local/bin/rspec
+    owner: root
+    group: root
+    mode: 0755

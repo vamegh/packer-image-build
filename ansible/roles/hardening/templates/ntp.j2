@@ -1,0 +1,13 @@
+# by default act only as a basic NTP client
+restrict -4 default kod nomodify notrap nopeer noquery
+restrict -6 default kod nomodify notrap nopeer noquery
+# allow NTP messages from the loopback address, useful for debugging
+restrict 127.0.0.1
+restrict -6 ::1
+# server(s) we time sync to
+server 0.ntp.core.myenergy.bgchprod.info iburst
+server 1.ntp.core.myenergy.bgchprod.info iburst
+server 2.ntp.core.myenergy.bgchprod.info iburst
+
+# Enable additional logging.
+logconfig =clockall =peerall =sysall =syncall

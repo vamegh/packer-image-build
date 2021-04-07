@@ -1,0 +1,104 @@
+{
+  "builders": [
+    {
+      "type": "amazon-ebs",
+      "region": "{{user `region`}}",
+      "source_ami_filter": {
+        "filters": {
+          "virtualization-type": "{{user `base_virt_type`}}",
+          "name": "{{user `base_ami_name`}}",
+          "root-device-type": "{{user `base_device_type`}}"
+        },
+        "owners": [
+          "{{user `ami_owner`}}"
+        ],
+        "most_recent": true
+      },
+      "instance_type": "{{user `instance_type`}}",
+      "iam_instance_profile": "{{user `iam_instance_profile`}}",
+      "ssh_username": "{{user `ssh_username`}}",
+      "ssh_pty": true,
+      "ami_name": "{{user `ami_role`}}.v{{user `version`}}-{{ (isotime (user `date_format`)) | clean_ami_name }}",
+      "ami_users": [],
+      "security_group_id": "{{user `packer_security_group_id`}}",
+      "subnet_id": "{{user `packer_subnet_id`}}",
+      "tags": {
+        "ami_role": "{{ user `ami_role`}}",
+        "release_status": "{{user `release_status`}}",
+        "builder": "packer {{packer_version}}",
+        "version": "{{user `version`}}",
+        "encrypted": "{{user `encrypted`}}",
+        "build_name": "{{build_name}}",
+        "build_type": "{{build_type}}"
+      },
+      "launch_block_device_mappings": [
+        {
+          "device_name": "{{user `root_device_name`}}",
+          "volume_type": "{{user `root_volume_type`}}",
+          "volume_size": "{{user `root_volume_size`}}",
+          "delete_on_termination": true
+        }
+      ],
+      "ami_block_device_mappings": [
+        {
+          "device_name": "{{user `root_device_name`}}",
+          "volume_type": "{{user `root_volume_type`}}",
+          "volume_size": "{{user `root_volume_size`}}",
+          "delete_on_termination": true
+        }
+      ]
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "file",
+      "source": "../../build-tools/scripts",
+      "destination": "/tmp/scripts"
+    },
+    {
+      "type": "file",
+      "source": "configs",
+      "destination": "/tmp/configs"
+    },
+    {
+      "type": "file",
+      "source": "../../build-tools/files",
+      "destination": "/tmp/files"
+    },
+    {
+      "type": "file",
+      "source": "tests",
+      "destination": "/tmp/tests"
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "sudo /bin/bash /tmp/scripts/ubuntu/install_ansible.sh",
+        "sudo /bin/bash /tmp/scripts/ubuntu/install_aws_tools.sh"
+      ]
+    },
+    {
+      "type": "shell-local",
+      "inline": [
+        "/usr/bin/env python3 ../../build-tools/scripts/generate_ansible_configs.py {{user `ansible_files`}}"
+      ]
+    },
+    {
+      "type": "ansible-local",
+      "playbook_file": "../../ansible/users.yml",
+      "group_vars": "generated/group_vars",
+      "role_paths": [
+        "../../ansible/roles/users_and_groups"
+      ]
+    },
+    {
+      "inline": [
+        "sudo rm -rf /tmp/scripts",
+        "sudo rm -rf /tmp/configs",
+        "sudo rm -rf /tmp/tests",
+        "sudo rm -rf /tmp/files"
+      ],
+      "type": "shell"
+    }
+  ]
+}

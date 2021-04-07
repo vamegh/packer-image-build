@@ -1,0 +1,63 @@
+---
+#
+# Uninstall unwanted packages
+# Avahi is not installed by default.
+#
+- name: RedHat - -
+  yum: name={{ item }} state=absent
+  with_items:
+    - httpd
+    - avahi
+    - bind
+    - cups
+    - cyrus-imapd
+    - dovecot
+    - exim
+    - ftp
+    - dhcp
+    - dhcpv6
+    - slapi-nis
+    - prelink
+    - rpcbind
+    - rsh
+    - rsync
+    - samba
+# Cannot remove LDAP on Amazon Linux, it's linked to too many things.
+#    - openldap
+    - net-snmp
+    - squid
+    - talk
+    - telnet
+    - vsftpd
+    - xinetd
+
+#
+# Add required non-standard packages
+#
+- name: RedHat - Install Auditd, NTP and pam_pwquality
+  yum: name={{ item }} state=latest
+  with_items:
+   - ntp
+   - audit
+   - libpwquality
+   - unzip
+
+- name: RedHat - Install Postfix
+  yum: name=postfix state=latest
+  notify: restart postfix
+
+# Install modern rsyslog version and repo
+- name: RedHat - Install rsyslog repo
+  template:
+    src: rsyslog.repo.j2
+    dest: /etc/yum.repos.d/rsyslog.repo
+    owner: root
+    group: root
+    mode: 640
+
+- name: RedHat - Install rsyslog
+  yum:
+    disablerepo: amzn-main
+    name: rsyslog
+    state: latest
+  notify: restart rsyslog

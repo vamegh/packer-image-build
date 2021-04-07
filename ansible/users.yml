@@ -1,0 +1,17 @@
+- name: Configure User Access
+  hosts: all
+  become: yes
+  become_method: sudo
+  roles:
+    - name: users_and_groups
+      sansible_users_and_groups_groups:
+        - name: devops
+          system: yes
+      sansible_users_and_groups_users:
+        - name: autobot
+          groups:
+            - devops
+            - sudo
+          password: '$6$10mK8xuhOOj$0dvy76BzwiD9dYdaIB1NfP5uzROyQyN7jhPi7rEzSJWGpZLdErN6LC8Vy6FZgNHl.ogsN6Lg1NSsms0ByzMaz/'
+          shell: /bin/bash
+          ssh_key: "{{ keys_path }}/autobot.pub"

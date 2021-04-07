@@ -1,0 +1,10 @@
+---
+
+- name: restart postfix
+  service: name=postfix state=restarted
+
+- name: restart auditd
+  service: name=auditd state=restarted enabled=yes
+
+- name: restart rsyslog
+  service: name=rsyslog state=restarted enabled=yes

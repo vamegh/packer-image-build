@@ -1,0 +1,58 @@
+#!/usr/bin/env python3
+#
+##
+##########################################################################
+#                                                                        #
+#       Jenkins Master IP Checker Process                                #
+#                                                                        #
+#       (c) 2019 Vamegh Hedayati                                         #
+#                                                                        #
+#       Vamegh Hedayati <gh_vhedayati AT ev9 DOT io>                     #
+#                                                                        #
+#       Please see Copying for License Information                       #
+#                             GNU/LGPL                                   #
+##########################################################################
+##
+#
+from build_libs.file_handler import FileHandler
+from build_libs.aws_meta import Meta
+from build_libs.aws_gather import get_jenkins_master
+import socket
+import sys
+import time
+
+__version__ = "0.0.1"
+
+
+def main():
+    meta_lookup = Meta()
+    handler = FileHandler()
+    meta_document = meta_lookup.document()
+    region = meta_document['region']
+    default_file = "/etc/default/jenkins"
+    host_name = socket.gethostname()
+
+    while True:
+        private_ip, master_info = get_jenkins_master(region=region)
+
+        file_data = handler.read_file(config_file=default_file, file_type="properties")
+        jenkins_url = ("http://{}:8080".format(private_ip))
+        try:
+            current_jenkins_url = file_data["JENKINS_URL"]
+        except KeyError:
+            current_jenkins_url = None
+
+        if jenkins_url != current_jenkins_url:
+            print("Master Jenkins Server ip / Jenkins URL Has Changed")
+            print("Updating Config Files and restarting Agent")
+            file_data["JENKINS_URL"] = jenkins_url
+            file_data['JENKINS_NAME'] = "_".join(['jenkins_agent', host_name])
+            handler.write_properties(output_file=default_file, data=file_data, enable_quotes=True)
+            break
+        time.sleep(300)
+    sys.exit(1)
+
+
+if __name__ == "__main__":
+    name = "get_jenkins_master"
+    main()

@@ -1,0 +1,108 @@
+---
+## Central Yaml Config file
+# This pulls in all of the various config elements to create a unified data dictionary used within this tool
+config_path: 'configs'
+temp_path: '/tmp/build-tools'
+
+## logging
+## can be debug, info, warning, error or critical
+logging_config:
+  log_level: "info"
+  log_file: 'logs/build-tools/build-tools.log'
+  log_file_level: 'info'
+
+# The various generic config files, required to make most of the libs work correctly
+color_map: 'configs/color_map.yaml'
+
+jenkins:
+  user_name: "admin"
+  password: "/home/jenkins/secrets/initialAdminPassword"
+  host: "localhost"
+  home: "/home/jenkins"
+  port: "8080"
+  https: "false"
+
+
+jenkins_master_settings:
+  jenkins_general:
+    script: "groovy/jenkins_general_configure.groovy"
+    config:
+      admin_email: ''
+      jnlp_slave_port: ''
+      master_labels: ''
+      master_executors: ''
+      frontend_url: ""
+      system_message: "Welcome to ev9 Jenkins"
+  global_libs:
+    script: "groovy/global_libs_configure.groovy"
+    config:
+      jenkins-global:
+        defaultVersion: 'master'
+        implicit: 'true'
+        allowVersionOverride: 'false'
+        includeInChangesets: 'true'
+        scm:
+          remote: 'https://github.com/vamegh/jenkins-global.git'
+          credentialsId: 'user_autobot'
+  github_plugin:
+    script: "groovy/github_plugin_configure.groovy"
+    config:
+      hookSharedSecretId: ''
+      servers:
+        github:
+          apiUrl: 'https://api.github.com'
+          manageHooks: 'true'
+          credentialsId: 'api_autobot'
+  github_auth:
+    script: "groovy/github_auth_configure.groovy"
+    config:
+      admin_users: "admin, vam, autobot"
+      org_name: "ev9"
+      use_repo_perms: True
+      auth_read: True
+      auth_create: True
+      webhook_read: True
+      cc_read: False
+      anon_read: False
+      anon_view: False
+  github_oauth:
+    script: "groovy/github_oauth_configure.groovy"
+    config:
+      client_id: ''
+      client_secret: ''
+      oauth_scopes: 'read:org,user:email,repo'
+
+aws:
+  filter_key: 'tag:Name'
+  filter_values:
+    - '*packer*'
+
+## do not include the environment / account name here - this is automatically populated
+## and will vary between accounts - this is just the generic names which should be should be available in every secrets manager
+## in every account we will be doing builds in
+aws_secrets:
+  - "jenkins/master"
+  - "jenkins/agent"
+  - "dns"
+
+jenkins_master_credentials:
+  - "credentials/github/user/autobot"
+  - "credentials/github/ssh/autobot"
+  - "credentials/github/api/autobot"
+  - "credentials/github/oauth/autobot"
+
+jenkins_agent_credentials:
+  - "credentials/github/swarm/autobot"
+
+groovy_scripts:
+  - "groovy/skip_wizard.groovy"
+  - "groovy/jnlp_agent_protocols.groovy"
+  - "groovy/configure-job-dsl-security.groovy"
+  - "groovy/upgrade-plugins.groovy"
+  #- "groovy/admin-script-approval.groovy"
+  #- "groovy/configure-global-jenkinsfile.groovy"
+
+packer_variables:
+
+
+

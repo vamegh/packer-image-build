@@ -1,0 +1,21 @@
+{
+    "version": "1",
+    "release_status": "release",
+    "base_ami_role": "core-ubuntu-base",
+    "base_release_status": "release",
+    "ami_role": "web-base",
+    "encrypted": "false",
+    "packer_security_group_id": "",
+    "packer_subnet_id": "",
+    "date_format": "2006-01-02",
+    "region": "eu-west-1",
+    "instance_type": "t2.large",
+    "iam_instance_profile": "packer-build",
+    "ssh_username": "ubuntu",
+    "root_device_name": "/dev/sda1",
+    "root_volume_type": "gp2",
+    "root_volume_size": "20",
+    "ami_owner": "self",
+    "packer_vpc_id": "",
+    "git_sha": ""
+}

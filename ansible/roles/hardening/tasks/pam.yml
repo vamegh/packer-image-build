@@ -1,0 +1,26 @@
+---
+# Configure PAM pwquality
+
+- name: Configure pwquality
+  template: src=pwquality.conf.j2 dest=/etc/security/pwquality.conf
+  tags: [pam]
+  
+- name: Configure pwquality
+  template: src=common-password.j2 dest=/etc/pam.d/common-password
+  tags: [pam]
+
+- name: RedHat - Prevent blank passwords
+  lineinfile:
+    path: /etc/pam.d/password-auth
+    state: present
+    regexp: 'auth\w+sufficient\w+pam_unix.so\w+nullok\w+try_first_pass'
+    line: 'auth sufficient pam_unix.so try_first_pass'
+  when: ansible_os_family == 'RedHat'
+
+# 5.6 Restrict access to SU to members of Wheel only.
+- name: Restrict access to SU
+  lineinfile:
+    path: /etc/pam.d/su
+    state: present
+    regexp: '^# auth\s+required\s+pam_wheel.so'
+    line: 'auth required pam_wheel.so use_uid'
